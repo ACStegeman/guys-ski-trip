@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trip Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#101c30;
+    --navy-2:#16253c;
+    --snow:#f4f7fb;
+    --pine:#24463b;
+    --ember:#e2963c;
+    --ember-2:#c97a24;
+    --ice:#6fb3d9;
+    --ink:#1b1f27;
+    --line:rgba(244,247,251,0.12);
+    --line-dark:rgba(16,28,48,0.12);
+    --green:#3fa34d;
+    --blue:#2e6fba;
+    --black:#14181f;
+    --gray:#8a8f98;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;padding:0;background:transparent;}
+  .app{
+    font-family:'Work Sans',sans-serif;
+    color:var(--ink);
+    background:var(--snow);
+    min-height:100%;
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:0 1px 3px rgba(0,0,0,0.08);
+  }
+  .display{font-family:'Bebas Neue',sans-serif; letter-spacing:0.04em;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+
+  /* Header */
+  header.hub{
+    background:linear-gradient(180deg,var(--navy) 0%, var(--navy-2) 100%);
+    color:var(--snow);
+    padding:28px 28px 0 28px;
+    position:relative;
+  }
+  .hub-top{
+    display:flex; justify-content:space-between; align-items:flex-start; gap:20px; flex-wrap:wrap;
+  }
+  .brand{display:flex; flex-direction:column; gap:2px;}
+  .brand .eyebrow{
+    font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:var(--ice); opacity:0.9;
+  }
+  .brand h1{
+    font-family:'Bebas Neue',sans-serif; font-size:44px; line-height:1; margin:4px 0 6px 0; letter-spacing:0.02em;
+  }
+  .brand .tagline{font-size:14px; color:rgba(244,247,251,0.65); max-width:440px;}
+  .edit-trip-btn{
+    background:transparent; border:1px solid rgba(244,247,251,0.35); color:var(--snow);
+    font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.06em; text-transform:uppercase;
+    padding:9px 14px; border-radius:6px; cursor:pointer; white-space:nowrap;
+  }
+  .edit-trip-btn:hover{border-color:var(--ember); color:var(--ember);}
+
+  .stat-row{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:0; margin-top:22px; border-top:1px solid var(--line);
+  }
+  .stat{
+    padding:14px 18px; border-right:1px solid var(--line);
+  }
+  .stat:last-child{border-right:none;}
+  .stat .k{font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ice); opacity:0.85;}
+  .stat .v{font-family:'JetBrains Mono',monospace; font-size:14px; margin-top:5px; color:var(--snow); word-break:break-word;}
+
+  /* elevation divider */
+  .elevation{display:block; width:100%; height:34px; margin-top:0;}
+
+  /* Tabs */
+  nav.tabs{
+    display:flex; background:var(--navy); padding:0 28px;
+  }
+  nav.tabs button{
+    background:transparent; border:none; color:rgba(244,247,251,0.55);
+    font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:0.1em; text-transform:uppercase;
+    padding:14px 18px 12px 18px; cursor:pointer; border-bottom:2px solid transparent; margin-right:4px;
+  }
+  nav.tabs button.active{color:var(--snow); border-bottom-color:var(--ember);}
+  nav.tabs button:hover{color:var(--snow);}
+
+  main{padding:26px 28px 40px 28px; background:var(--snow);}
+  .panel{display:none;}
+  .panel.active{display:block; animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);}}
+
+  h2.section-title{
+    font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:0.02em; margin:0 0 4px 0; color:var(--navy);
+  }
+  p.section-sub{color:#6b7280; font-size:13px; margin:0 0 18px 0;}
+
+  .card{
+    background:#fff; border:1px solid #e7eaf0; border-radius:var(--radius); padding:18px 20px; margin-bottom:16px;
+  }
+  .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  @media(max-width:720px){.grid-2{grid-template-columns:1fr;} .stat-row{grid-template-columns:1fr 1fr;} .stat{border-bottom:1px solid var(--line);}}
+
+  /* Info tab blocks */
+  .block-header{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;}
+  .block-header h3{font-family:'Bebas Neue',sans-serif; font-size:19px; letter-spacing:0.02em; margin:0; color:var(--navy);}
+  .mini-btn{
+    background:var(--navy); color:var(--snow); border:none; border-radius:6px; padding:6px 11px;
+    font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer;
+  }
+  .mini-btn:hover{background:var(--ember-2);}
+  .mini-btn.ghost{background:transparent; color:#8a8f98; border:1px solid #d9dde3;}
+  .mini-btn.ghost:hover{color:#c0392b; border-color:#c0392b;}
+
+  ul.plain{list-style:none; margin:0; padding:0;}
+  ul.plain li{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:9px 0; border-bottom:1px solid #eef0f4; font-size:14px;
+  }
+  ul.plain li:last-child{border-bottom:none;}
+  ul.plain li .rm{cursor:pointer; color:#c6cad3; font-size:15px; line-height:1;}
+  ul.plain li .rm:hover{color:#c0392b;}
+
+  .itin-item{padding:10px 0; border-bottom:1px solid #eef0f4;}
+  .itin-item:last-child{border-bottom:none;}
+  .itin-item .day{font-family:'JetBrains Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:var(--ember-2);}
+  .itin-item .desc{font-size:14px; margin-top:2px;}
+
+  .add-inline{display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;}
+  .add-inline input{flex:1; min-width:120px;}
+
+  input[type=text], input[type=number], textarea, select{
+    width:100%; padding:9px 11px; border:1px solid #d9dde3; border-radius:6px; font-family:'Work Sans',sans-serif; font-size:14px; background:#fff;
+  }
+  textarea{resize:vertical; min-height:64px;}
+  label.field-label{font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:#8a8f98; font-family:'JetBrains Mono',monospace; display:block; margin-bottom:5px;}
+  .field{margin-bottom:12px;}
+
+  /* Crew / roster */
+  .whoami{
+    display:flex; gap:10px; align-items:center; background:#fff; border:1px dashed #d9dde3; border-radius:var(--radius);
+    padding:12px 16px; margin-bottom:18px; flex-wrap:wrap;
+  }
+  .whoami .label{font-size:12px; color:#6b7280; white-space:nowrap;}
+  .whoami input{max-width:220px;}
+
+  .self-status-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+  .status-choice{
+    display:flex; align-items:center; gap:7px; border:1px solid #d9dde3; border-radius:8px; padding:8px 12px; cursor:pointer; font-size:13px;
+  }
+  .status-choice.selected{border-color:var(--navy); background:#eef2f8;}
+  .badge{width:14px; height:14px; border-radius:50%; display:inline-block; flex-shrink:0;}
+  .badge.square{border-radius:3px;}
+  .badge.diamond{border-radius:2px; transform:rotate(45deg);}
+
+  table.roster{width:100%; border-collapse:collapse; font-size:14px;}
+  table.roster th{
+    text-align:left; font-family:'JetBrains Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:0.08em;
+    color:#8a8f98; padding:8px 10px; border-bottom:1px solid #e7eaf0;
+  }
+  table.roster td{padding:10px; border-bottom:1px solid #f0f1f4; vertical-align:top;}
+  table.roster tr:last-child td{border-bottom:none;}
+  .status-pill{display:inline-flex; align-items:center; gap:6px; font-size:12px; font-family:'JetBrains Mono',monospace;}
+  .filter-row{display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;}
+  .chip{
+    border:1px solid #d9dde3; background:#fff; border-radius:20px; padding:6px 13px; font-size:12px; cursor:pointer; color:#555;
+  }
+  .chip.active{background:var(--navy); color:var(--snow); border-color:var(--navy);}
+  .legend{display:flex; gap:16px; flex-wrap:wrap; margin-top:14px; font-size:12px; color:#6b7280;}
+  .legend span{display:flex; align-items:center; gap:6px;}
+
+  /* Polls */
+  .poll-card{background:#fff; border:1px solid #e7eaf0; border-radius:var(--radius); padding:18px 20px; margin-bottom:16px;}
+  .poll-q{font-family:'Bebas Neue',sans-serif; font-size:20px; color:var(--navy); margin:0 0 3px 0;}
+  .poll-meta{font-size:11px; color:#9aa0aa; font-family:'JetBrains Mono',monospace; margin-bottom:14px;}
+  .poll-option{margin-bottom:9px; cursor:pointer;}
+  .poll-option .row{display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px;}
+  .poll-option .row .lbl{display:flex; align-items:center; gap:7px;}
+  .bar-track{background:#eef0f4; border-radius:5px; height:9px; overflow:hidden;}
+  .bar-fill{background:var(--ember); height:100%; border-radius:5px; transition:width .4s ease;}
+  .poll-option.picked .bar-fill{background:var(--navy);}
+  .poll-option.picked .lbl{font-weight:600;}
+  .poll-footer{display:flex; justify-content:space-between; align-items:center; margin-top:12px;}
+
+  .new-poll-form{display:none;}
+  .new-poll-form.open{display:block;}
+  .option-inputs{display:flex; flex-direction:column; gap:8px; margin-bottom:10px;}
+  .option-inputs .opt-row{display:flex; flex-direction:column; gap:6px; border:1px solid #eef0f4; border-radius:8px; padding:10px; margin-bottom:2px;}
+  .option-inputs .opt-row input{flex:1;}
+  .option-inputs .opt-row .detail-field{display:none; font-size:12px;}
+  .option-inputs .opt-row.show-details .detail-field{display:block;}
+  .poll-detail-toggle{display:flex; align-items:center; gap:7px; font-size:12px; color:#4b5160; margin-bottom:12px;}
+  .poll-detail-toggle input{width:auto;}
+  .opt-note-display{font-size:12px; color:#8a8f98; margin-top:2px;}
+  .opt-link{color:var(--ember-2); text-decoration:none;}
+  .opt-link:hover{text-decoration:underline;}
+
+  .empty{color:#9aa0aa; font-size:13px; padding:20px 0; text-align:center;}
+  .save-hint{font-size:11px; color:#9aa0aa; margin-top:6px;}
+
+  .modal-backdrop{
+    position:fixed; inset:0; background:rgba(16,28,48,0.55); display:none; align-items:center; justify-content:center; z-index:50; padding:20px;
+  }
+  .modal-backdrop.open{display:flex;}
+  .modal{background:#fff; border-radius:12px; padding:24px; max-width:520px; width:100%; max-height:85vh; overflow:auto;}
+  .modal h3{font-family:'Bebas Neue',sans-serif; font-size:22px; margin:0 0 14px 0; color:var(--navy);}
+  .modal-actions{display:flex; justify-content:flex-end; gap:10px; margin-top:16px;}
+  .btn-primary{background:var(--ember); color:#fff; border:none; padding:10px 18px; border-radius:7px; font-weight:600; cursor:pointer; font-size:13px;}
+  .btn-primary:hover{background:var(--ember-2);}
+  .btn-secondary{background:transparent; border:1px solid #d9dde3; padding:10px 18px; border-radius:7px; cursor:pointer; font-size:13px; color:#555;}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <header class="hub">
+    <div class="hub-top">
+      <div class="brand">
+        <div class="eyebrow" id="yearLabel">TRIP · ----</div>
+        <h1 id="tripName">Loading…</h1>
+        <div class="tagline" id="tripTagline"></div>
+      </div>
+      <div style="display:flex; gap:8px; align-items:flex-start;">
+        <button class="edit-trip-btn" id="editTripBtn" onclick="openTripEdit()" style="display:none;">Edit trip details</button>
+        <button class="edit-trip-btn" id="adminAuthBtn" onclick="openAdminAuth()">Admin sign in</button>
+      </div>
+    </div>
+    <div class="stat-row">
+      <div class="stat"><div class="k">Dates</div><div class="v" id="statDates">—</div></div>
+      <div class="stat"><div class="k">Location</div><div class="v" id="statLocation">—</div></div>
+      <div class="stat"><div class="k">Lodging</div><div class="v" id="statLodging">—</div></div>
+      <div class="stat"><div class="k">Est. Cost</div><div class="v" id="statCost">—</div></div>
+    </div>
+    <svg class="elevation" viewBox="0 0 800 34" preserveAspectRatio="none">
+      <polyline points="0,30 40,26 80,28 120,14 160,18 200,6 240,12 280,20 320,10 360,16 400,4 440,14 480,22 520,12 560,18 600,8 640,16 680,24 720,14 760,20 800,26"
+        fill="none" stroke="rgba(244,247,251,0.28)" stroke-width="2"/>
+    </svg>
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="landing" onclick="switchTab('landing')">Get Started</button>
+      <button class="tab-btn" data-tab="info" onclick="switchTab('info')">Trail Info</button>
+      <button class="tab-btn" data-tab="crew" onclick="switchTab('crew')">Crew</button>
+      <button class="tab-btn" data-tab="polls" onclick="switchTab('polls')">Polls</button>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- LANDING PANEL -->
+    <section class="panel active" id="panel-landing">
+      <h2 class="section-title" id="landingTitle">Are you in?</h2>
+      <p class="section-sub">Right now all we need is your name and which dates could work — everything else opens up once dates are locked.</p>
+
+      <div class="whoami">
+        <span class="label">You are:</span>
+        <input type="text" id="identityInputLanding" placeholder="Type your name" onchange="syncIdentity(this.value)">
+        <span class="save-hint" id="identitySavedLanding" style="display:none;">saved ✓</span>
+      </div>
+
+      <div id="landingPollArea"><div class="empty">No dates poll yet.</div></div>
+
+      <div class="card" style="margin-top:4px;">
+        <div class="block-header"><h3>Who's responded</h3></div>
+        <table class="roster">
+          <thead><tr><th>Name</th><th>Dates that work</th><th>Status</th></tr></thead>
+          <tbody id="landingResponsesBody"></tbody>
+        </table>
+        <div class="empty" id="landingResponsesEmpty" style="display:none;">No responses yet — be the first.</div>
+      </div>
+      <p class="save-hint">Voting here automatically marks you as <strong>Interested</strong> on the Crew roster. Want to set a stronger commitment level or add a note? Head to the Crew tab.</p>
+    </section>
+
+    <!-- INFO PANEL -->
+    <section class="panel" id="panel-info">
+      <div class="grid-2">
+        <div>
+          <div class="card">
+            <div class="block-header"><h3>Itinerary</h3><button class="mini-btn admin-only" id="addItinBtn" onclick="addItinItem()" style="display:none;">+ Add day</button></div>
+            <div id="itinList"><div class="empty">No itinerary yet.</div></div>
+          </div>
+          <div class="card">
+            <div class="block-header"><h3>Packing list</h3><button class="mini-btn admin-only" id="addPackBtn" onclick="addPackItem()" style="display:none;">+ Add item</button></div>
+            <ul class="plain" id="packList"><li class="empty" style="display:block;">Nothing on the list yet.</li></ul>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="block-header"><h3>Travel &amp; carpool notes</h3><button class="mini-btn admin-only" id="editTravelBtn" onclick="editTravelNotes()" style="display:none;">Edit</button></div>
+            <p id="travelNotes" style="font-size:14px; color:#4b5160; white-space:pre-wrap; margin:0;">No travel notes yet.</p>
+          </div>
+          <div class="card">
+            <div class="block-header"><h3>Carpool board</h3><button class="mini-btn" onclick="addCarpool()">+ Offer/find a ride</button></div>
+            <div id="carpoolList"><div class="empty">No rides posted yet.</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CREW PANEL -->
+    <section class="panel" id="panel-crew">
+      <h2 class="section-title">Crew roster</h2>
+      <p class="section-sub">Everyone who's ever been in the mix for a trip — past, present, and maybe.</p>
+
+      <div class="whoami">
+        <span class="label">You are:</span>
+        <input type="text" id="identityInput" placeholder="Type your name" onchange="syncIdentity(this.value)">
+        <span class="save-hint" id="identitySaved" style="display:none;">saved ✓</span>
+      </div>
+
+      <div class="card">
+        <div class="block-header"><h3>Update my status</h3></div>
+        <div class="self-status-row" id="selfStatusRow"></div>
+        <div class="add-inline">
+          <input type="text" id="selfNote" placeholder="Optional note (e.g. can only do first week of Feb)">
+          <button class="mini-btn" onclick="submitSelfStatus()">Save my status</button>
+        </div>
+      </div>
+
+      <div class="filter-row" id="filterRow"></div>
+
+      <div class="card">
+        <table class="roster">
+          <thead><tr><th>Name</th><th>Status</th><th>Note</th><th>Updated</th><th></th></tr></thead>
+          <tbody id="rosterBody"></tbody>
+        </table>
+        <div class="empty" id="rosterEmpty" style="display:none;">No one's on the roster yet — be the first.</div>
+      </div>
+
+      <div class="legend">
+        <span><span class="badge" style="background:var(--green)"></span> Interested</span>
+        <span><span class="badge square" style="background:var(--blue)"></span> Likely</span>
+        <span><span class="badge diamond" style="background:var(--black)"></span> Locked in</span>
+        <span><span class="badge" style="background:var(--gray)"></span> Not this year</span>
+      </div>
+    </section>
+
+    <!-- POLLS PANEL -->
+    <section class="panel" id="panel-polls">
+      <div class="block-header" style="margin-bottom:10px;">
+        <div>
+          <h2 class="section-title" style="margin-bottom:0;">Polls</h2>
+          <p class="section-sub" style="margin-bottom:0;">Vote using the name you set on the Crew tab.</p>
+        </div>
+        <button class="mini-btn" onclick="toggleNewPoll()">+ New poll</button>
+      </div>
+
+      <div class="card new-poll-form" id="newPollForm">
+        <div class="field">
+          <label class="field-label">Question</label>
+          <input type="text" id="pollQuestion" placeholder="e.g. Are you in for the 2027 trip?">
+        </div>
+        <div class="field">
+          <label class="poll-detail-toggle">
+            <input type="checkbox" id="pollAllowMultiple">
+            Allow selecting more than one option (e.g. if several dates work)
+          </label>
+        </div>
+        <div class="field">
+          <label class="poll-detail-toggle">
+            <input type="checkbox" id="pollHasDetails" onchange="toggleDetailFields()">
+            Include a link + note per option (e.g. Airbnb listings — price, sleeps, etc.)
+          </label>
+          <label class="field-label">Options</label>
+          <div class="option-inputs" id="pollOptionInputs">
+            <div class="opt-row">
+              <input type="text" class="opt-label" placeholder="Option label" value="Yes">
+              <input type="text" class="opt-url detail-field" placeholder="Link (optional)">
+              <input type="text" class="opt-note detail-field" placeholder="Note — price/night, sleeps, address, etc. (optional)">
+            </div>
+            <div class="opt-row">
+              <input type="text" class="opt-label" placeholder="Option label" value="No">
+              <input type="text" class="opt-url detail-field" placeholder="Link (optional)">
+              <input type="text" class="opt-note detail-field" placeholder="Note — price/night, sleeps, address, etc. (optional)">
+            </div>
+          </div>
+          <button class="mini-btn ghost" onclick="addOptionInput()">+ Add option</button>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-secondary" onclick="toggleNewPoll()">Cancel</button>
+          <button class="btn-primary" onclick="createPoll()">Create poll</button>
+        </div>
+      </div>
+
+      <div id="pollsList"><div class="empty">No polls yet.</div></div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Trip edit modal -->
+<div class="modal-backdrop" id="tripModal">
+  <div class="modal">
+    <h3>Edit trip details</h3>
+    <div class="field"><label class="field-label">Trip name</label><input type="text" id="editName"></div>
+    <div class="field"><label class="field-label">Year</label><input type="text" id="editYear"></div>
+    <div class="field"><label class="field-label">Tagline</label><input type="text" id="editTagline"></div>
+    <div class="field"><label class="field-label">Dates</label><input type="text" id="editDates" placeholder="e.g. Jan 22 – 26, 2027"></div>
+    <div class="field"><label class="field-label">Location</label><input type="text" id="editLocation" placeholder="e.g. Park City, UT"></div>
+    <div class="field"><label class="field-label">Lodging</label><input type="text" id="editLodging" placeholder="e.g. 4BR condo at Canyons"></div>
+    <div class="field"><label class="field-label">Estimated cost</label><input type="text" id="editCost" placeholder="e.g. ~$650/person"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('tripModal')">Cancel</button>
+      <button class="btn-primary" onclick="saveTripEdit()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- generic prompt modal for small inline adds -->
+<div class="modal-backdrop" id="genericModal">
+  <div class="modal">
+    <h3 id="genericModalTitle">Add</h3>
+    <div id="genericModalBody"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('genericModal')">Cancel</button>
+      <button class="btn-primary" id="genericModalSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- admin sign-in modal -->
+<div class="modal-backdrop" id="adminModal">
+  <div class="modal">
+    <h3 id="adminModalTitle">Admin sign in</h3>
+    <div id="adminSignInBody">
+      <div class="field"><label class="field-label">Email</label><input type="text" id="adminEmail" autocomplete="username"></div>
+      <div class="field"><label class="field-label">Password</label><input type="password" id="adminPassword" autocomplete="current-password"></div>
+      <div class="save-hint" id="adminAuthError" style="display:none; color:#c0392b;"></div>
+    </div>
+    <div id="adminSignedInBody" style="display:none;">
+      <p style="font-size:14px; color:#4b5160;">Signed in as <strong id="adminEmailDisplay"></strong>. You can edit trip details, itinerary, packing list, and travel notes.</p>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('adminModal')">Close</button>
+      <button class="btn-primary" id="adminSignInBtn" onclick="adminSignIn()">Sign in</button>
+      <button class="btn-primary" id="adminSignOutBtn" onclick="adminSignOut()" style="display:none; background:#c0392b;">Sign out</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase (Firestore) — replaces Claude's window.storage so the site works
+     for anyone, no Claude account required. Data is shared across everyone
+     who opens this page. -->
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyApvXFn1RUutr-7C4CNhfXPX22m3dScDoI",
+    authDomain: "guys-ski-trip.firebaseapp.com",
+    projectId: "guys-ski-trip",
+    storageBucket: "guys-ski-trip.firebasestorage.app",
+    messagingSenderId: "720123535331",
+    appId: "1:720123535331:web:737d4128a7f23b029ecad6"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const auth = firebase.auth();
+  const FS_COLLECTION = 'ski_trip_data';
+</script>
+
+<script>
+const STATUS_DEFS = [
+  {id:'interested', label:'Interested', color:'var(--green)', shape:''},
+  {id:'likely', label:'Likely', color:'var(--blue)', shape:'square'},
+  {id:'locked', label:'Locked in', color:'var(--black)', shape:'diamond'},
+  {id:'out', label:'Not this year', color:'var(--gray)', shape:''}
+];
+
+let state = {
+  trip: null,
+  roster: [],
+  polls: [],
+  carpool: [],
+  identity: '',
+  activeFilter: 'all',
+  isAdmin: false
+};
+
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+// Shared data (trip info, roster, polls) lives in Firestore, one document per
+// key. Personal data (just "identity" — the name typed in on this device)
+// lives in localStorage, since there's no per-user account anymore.
+async function safeGet(key, shared, fallback){
+  try{
+    if(!shared){
+      const raw = localStorage.getItem('skihub_' + key);
+      return raw ? JSON.parse(raw) : fallback;
+    }
+    const snap = await db.collection(FS_COLLECTION).doc(key).get();
+    if(!snap.exists) return fallback;
+    const data = snap.data();
+    if(!data || data.value === undefined || data.value === null) return fallback;
+    return JSON.parse(data.value);
+  }catch(e){
+    console.error('storage get failed', key, e);
+    return fallback;
+  }
+}
+async function safeSet(key, value, shared){
+  try{
+    if(!shared){
+      localStorage.setItem('skihub_' + key, JSON.stringify(value));
+      return;
+    }
+    await db.collection(FS_COLLECTION).doc(key).set({
+      value: JSON.stringify(value),
+      updatedAt: Date.now()
+    });
+  }catch(e){
+    console.error('storage set failed', key, e);
+  }
+}
+
+async function init(){
+  const defaultTrip = {
+    name: 'A Bunch of Guys, A Few Mountains',
+    year: new Date().getFullYear()+1,
+    tagline: 'Summit County, CO — whoever\'s in, wherever the snow\'s good.',
+    dates: 'TBD',
+    location: 'Summit County, CO',
+    lodging: 'TBD',
+    cost: '~$2,000',
+    itinerary: [],
+    packing: [],
+    travelNotes: 'Fly into Denver (DEN). Post your flight details and rental car / shuttle plans on the carpool board below so we can split rides up from the airport.',
+    seededDatePoll: false
+  };
+  state.trip = await safeGet('trip_info', true, defaultTrip);
+  if(state.trip.seededDatePoll === undefined) state.trip.seededDatePoll = false;
+  // migrate old data: carpool used to live inside trip_info, now it's its own doc
+  if(Array.isArray(state.trip.carpool) && state.trip.carpool.length){
+    state.carpool = state.trip.carpool;
+    delete state.trip.carpool;
+    await safeSet('carpool', state.carpool, true);
+    await safeSet('trip_info', state.trip, true);
+  }else{
+    delete state.trip.carpool;
+    state.carpool = await safeGet('carpool', true, []);
+  }
+  state.roster = await safeGet('roster', true, []);
+  state.polls = await safeGet('polls', true, []);
+
+  if(!state.trip.seededDatePoll){
+    state.polls.unshift({
+      id: uid(),
+      question: 'Preferred dates for the ' + state.trip.year + ' trip (Wed–Sun)',
+      options: [
+        {id:uid(), label:'Feb 17–21'},
+        {id:uid(), label:'Feb 24–28'},
+        {id:uid(), label:'Mar 3–7'},
+        {id:uid(), label:'Mar 10–14'},
+        {id:uid(), label:'None of these work for me'}
+      ],
+      allowMultiple: true,
+      isRsvpPoll: true,
+      votes: {},
+      createdAt: Date.now()
+    });
+    state.trip.seededDatePoll = true;
+    await safeSet('trip_info', state.trip, true);
+    await safeSet('polls', state.polls, true);
+  }
+
+  // One-time cleanup / migration:
+  // 1) remove the Mar 17-21 option if it already exists in saved poll data
+  //    (it conflicts with OAC Jr High State wrestling, Mar 20-21, 2027)
+  // 2) upgrade any old single-value votes ({voter: optionId}) to the
+  //    array format ({voter: [optionId]}) multi-select polls need
+  let pollsChanged = false;
+  state.polls.forEach(p=>{
+    if(p.allowMultiple === undefined) p.allowMultiple = false;
+    if(p.isRsvpPoll === undefined){
+      p.isRsvpPoll = p.question.indexOf('Preferred dates for the') === 0;
+      pollsChanged = true;
+    }
+    Object.keys(p.votes).forEach(voter=>{
+      if(!Array.isArray(p.votes[voter])){
+        p.votes[voter] = [p.votes[voter]];
+        pollsChanged = true;
+      }
+    });
+    const conflictOpt = p.options.find(o=>o.label === 'Mar 17–21');
+    if(conflictOpt){
+      p.options = p.options.filter(o=>o.id !== conflictOpt.id);
+      Object.keys(p.votes).forEach(voter=>{
+        p.votes[voter] = p.votes[voter].filter(id=>id!==conflictOpt.id);
+        if(p.votes[voter].length === 0) delete p.votes[voter];
+      });
+      pollsChanged = true;
+    }
+  });
+  if(pollsChanged) await safeSet('polls', state.polls, true);
+  const idn = await safeGet('identity', false, {name:''});
+  state.identity = idn.name || '';
+  document.getElementById('identityInput').value = state.identity;
+  document.getElementById('identityInputLanding').value = state.identity;
+
+  renderTrip();
+  renderStatusChoices();
+  renderFilters();
+  renderRoster();
+  renderPolls();
+  renderLanding();
+
+  auth.onAuthStateChanged(user=>{
+    state.isAdmin = !!user;
+    updateAdminUI(user);
+  });
+}
+
+/* ---------- ADMIN AUTH ---------- */
+function updateAdminUI(user){
+  document.getElementById('editTripBtn').style.display = state.isAdmin ? 'inline-block' : 'none';
+  document.getElementById('addItinBtn').style.display = state.isAdmin ? 'inline-block' : 'none';
+  document.getElementById('addPackBtn').style.display = state.isAdmin ? 'inline-block' : 'none';
+  document.getElementById('editTravelBtn').style.display = state.isAdmin ? 'inline-block' : 'none';
+  document.getElementById('adminAuthBtn').textContent = state.isAdmin ? 'Admin' : 'Admin sign in';
+  document.getElementById('adminSignInBody').style.display = state.isAdmin ? 'none' : 'block';
+  document.getElementById('adminSignedInBody').style.display = state.isAdmin ? 'block' : 'none';
+  document.getElementById('adminSignInBtn').style.display = state.isAdmin ? 'none' : 'inline-block';
+  document.getElementById('adminSignOutBtn').style.display = state.isAdmin ? 'inline-block' : 'none';
+  if(user) document.getElementById('adminEmailDisplay').textContent = user.email;
+  // re-render itinerary/packing so the remove (✕) controls show/hide correctly
+  if(state.trip) renderTrip();
+}
+
+function openAdminAuth(){
+  document.getElementById('adminAuthError').style.display = 'none';
+  document.getElementById('adminModal').classList.add('open');
+}
+
+async function adminSignIn(){
+  const email = document.getElementById('adminEmail').value.trim();
+  const password = document.getElementById('adminPassword').value;
+  const errEl = document.getElementById('adminAuthError');
+  errEl.style.display = 'none';
+  if(!email || !password){ errEl.textContent = 'Enter your email and password.'; errEl.style.display = 'block'; return; }
+  try{
+    await auth.signInWithEmailAndPassword(email, password);
+    document.getElementById('adminPassword').value = '';
+    closeModal('adminModal');
+  }catch(e){
+    errEl.textContent = 'Sign-in failed — check your email and password.';
+    errEl.style.display = 'block';
+  }
+}
+
+async function adminSignOut(){
+  await auth.signOut();
+  closeModal('adminModal');
+}
+
+/* ---------- TAB SWITCHING ---------- */
+function switchTab(tab){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+tab).classList.add('active');
+}
+
+/* ---------- TRIP INFO ---------- */
+function renderTrip(){
+  const t = state.trip;
+  document.getElementById('yearLabel').textContent = 'TRIP · ' + t.year;
+  document.getElementById('tripName').textContent = t.name;
+  document.getElementById('tripTagline').textContent = t.tagline;
+  document.getElementById('statDates').textContent = t.dates || '—';
+  document.getElementById('statLocation').textContent = t.location || '—';
+  document.getElementById('statLodging').textContent = t.lodging || '—';
+  document.getElementById('statCost').textContent = t.cost || '—';
+  document.getElementById('travelNotes').textContent = t.travelNotes || 'No travel notes yet.';
+
+  const itinEl = document.getElementById('itinList');
+  itinEl.innerHTML = '';
+  if(!t.itinerary.length){ itinEl.innerHTML = '<div class="empty">No itinerary yet.</div>'; }
+  t.itinerary.forEach(it=>{
+    const div = document.createElement('div');
+    div.className = 'itin-item';
+    div.innerHTML = `<div style="display:flex; justify-content:space-between;">
+        <div><div class="day">${escapeHtml(it.label)}</div><div class="desc">${escapeHtml(it.desc)}</div></div>
+        ${state.isAdmin ? `<span class="rm" onclick="removeItin('${it.id}')">✕</span>` : ''}
+      </div>`;
+    itinEl.appendChild(div);
+  });
+
+  const packEl = document.getElementById('packList');
+  packEl.innerHTML = '';
+  if(!t.packing.length){ packEl.innerHTML = '<li class="empty" style="display:block;">Nothing on the list yet.</li>'; }
+  t.packing.forEach(p=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<span>${escapeHtml(p.item)}</span>${state.isAdmin ? `<span class="rm" onclick="removePack('${p.id}')">✕</span>` : ''}`;
+    packEl.appendChild(li);
+  });
+
+  const cpEl = document.getElementById('carpoolList');
+  cpEl.innerHTML = '';
+  if(!state.carpool.length){ cpEl.innerHTML = '<div class="empty">No rides posted yet.</div>'; }
+  state.carpool.forEach(c=>{
+    const div = document.createElement('div');
+    div.className = 'itin-item';
+    div.innerHTML = `<div style="display:flex; justify-content:space-between;">
+      <div><div class="day">${escapeHtml(c.name)} · ${c.seats} seat(s) from ${escapeHtml(c.from)}</div>
+      <div class="desc">${escapeHtml(c.notes||'')}${c.contact ? ' · '+escapeHtml(c.contact) : ''}</div></div>
+      <span class="rm" onclick="removeCarpool('${c.id}')">✕</span></div>`;
+    cpEl.appendChild(div);
+  });
+}
+
+function requireAdmin(){
+  if(!state.isAdmin){
+    openAdminAuth();
+    return false;
+  }
+  return true;
+}
+
+function openTripEdit(){
+  if(!requireAdmin()) return;
+  const t = state.trip;
+  document.getElementById('editName').value = t.name;
+  document.getElementById('editYear').value = t.year;
+  document.getElementById('editTagline').value = t.tagline;
+  document.getElementById('editDates').value = t.dates;
+  document.getElementById('editLocation').value = t.location;
+  document.getElementById('editLodging').value = t.lodging;
+  document.getElementById('editCost').value = t.cost;
+  document.getElementById('tripModal').classList.add('open');
+}
+async function saveTripEdit(){
+  if(!requireAdmin()) return;
+  state.trip.name = document.getElementById('editName').value || state.trip.name;
+  state.trip.year = document.getElementById('editYear').value || state.trip.year;
+  state.trip.tagline = document.getElementById('editTagline').value;
+  state.trip.dates = document.getElementById('editDates').value;
+  state.trip.location = document.getElementById('editLocation').value;
+  state.trip.lodging = document.getElementById('editLodging').value;
+  state.trip.cost = document.getElementById('editCost').value;
+  await safeSet('trip_info', state.trip, true);
+  renderTrip();
+  closeModal('tripModal');
+}
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+function addItinItem(){
+  if(!requireAdmin()) return;
+  openGeneric('Add itinerary day', `
+    <div class="field"><label class="field-label">Day label</label><input type="text" id="gi_label" placeholder="e.g. Friday, Jan 22"></div>
+    <div class="field"><label class="field-label">Description</label><textarea id="gi_desc" placeholder="e.g. Arrive, grab lift tickets, group dinner at the condo"></textarea></div>
+  `, async ()=>{
+    const label = document.getElementById('gi_label').value.trim();
+    const desc = document.getElementById('gi_desc').value.trim();
+    if(!label) return;
+    state.trip.itinerary.push({id:uid(), label, desc});
+    await safeSet('trip_info', state.trip, true);
+    renderTrip();
+    closeModal('genericModal');
+  });
+}
+async function removeItin(id){
+  if(!requireAdmin()) return;
+  state.trip.itinerary = state.trip.itinerary.filter(i=>i.id!==id);
+  await safeSet('trip_info', state.trip, true);
+  renderTrip();
+}
+function addPackItem(){
+  if(!requireAdmin()) return;
+  openGeneric('Add packing item', `
+    <div class="field"><label class="field-label">Item</label><input type="text" id="gp_item" placeholder="e.g. Goggles + backup lens"></div>
+  `, async ()=>{
+    const item = document.getElementById('gp_item').value.trim();
+    if(!item) return;
+    state.trip.packing.push({id:uid(), item});
+    await safeSet('trip_info', state.trip, true);
+    renderTrip();
+    closeModal('genericModal');
+  });
+}
+async function removePack(id){
+  if(!requireAdmin()) return;
+  state.trip.packing = state.trip.packing.filter(p=>p.id!==id);
+  await safeSet('trip_info', state.trip, true);
+  renderTrip();
+}
+function editTravelNotes(){
+  if(!requireAdmin()) return;
+  openGeneric('Edit travel & carpool notes', `
+    <div class="field"><textarea id="gt_notes" style="min-height:120px;">${escapeHtml(state.trip.travelNotes||'')}</textarea></div>
+  `, async ()=>{
+    state.trip.travelNotes = document.getElementById('gt_notes').value;
+    await safeSet('trip_info', state.trip, true);
+    renderTrip();
+    closeModal('genericModal');
+  });
+}
+function addCarpool(){
+  openGeneric('Post a ride', `
+    <div class="field"><label class="field-label">Your name</label><input type="text" id="gc_name" value="${escapeHtml(state.identity)}"></div>
+    <div class="field"><label class="field-label">Departing from</label><input type="text" id="gc_from" value="Denver Airport (DEN)" placeholder="e.g. Denver Airport (DEN)"></div>
+    <div class="field"><label class="field-label">Open seats</label><input type="number" id="gc_seats" value="1" min="0"></div>
+    <div class="field"><label class="field-label">Contact (optional)</label><input type="text" id="gc_contact" placeholder="phone / email"></div>
+    <div class="field"><label class="field-label">Notes</label><input type="text" id="gc_notes" placeholder="e.g. leaving Thursday night"></div>
+  `, async ()=>{
+    const name = document.getElementById('gc_name').value.trim();
+    const from = document.getElementById('gc_from').value.trim();
+    if(!name || !from) return;
+    state.carpool.push({
+      id:uid(), name, from,
+      seats: document.getElementById('gc_seats').value || 0,
+      contact: document.getElementById('gc_contact').value.trim(),
+      notes: document.getElementById('gc_notes').value.trim()
+    });
+    await safeSet('carpool', state.carpool, true);
+    renderTrip();
+    closeModal('genericModal');
+  });
+}
+async function removeCarpool(id){
+  state.carpool = state.carpool.filter(c=>c.id!==id);
+  await safeSet('carpool', state.carpool, true);
+  renderTrip();
+}
+
+function openGeneric(title, bodyHtml, onSave){
+  document.getElementById('genericModalTitle').textContent = title;
+  document.getElementById('genericModalBody').innerHTML = bodyHtml;
+  const btn = document.getElementById('genericModalSave');
+  const newBtn = btn.cloneNode(true);
+  btn.parentNode.replaceChild(newBtn, btn);
+  newBtn.addEventListener('click', onSave);
+  document.getElementById('genericModal').classList.add('open');
+}
+
+/* ---------- IDENTITY ---------- */
+async function syncIdentity(name){
+  name = (name || '').trim();
+  state.identity = name;
+  await safeSet('identity', {name}, false);
+  document.getElementById('identityInput').value = name;
+  document.getElementById('identityInputLanding').value = name;
+  ['identitySaved','identitySavedLanding'].forEach(id=>{
+    const savedEl = document.getElementById(id);
+    savedEl.style.display = 'inline';
+    setTimeout(()=>savedEl.style.display='none', 1500);
+  });
+  renderStatusChoices();
+  renderRoster();
+  renderPolls();
+  renderLanding();
+}
+
+/* ---------- ROSTER ---------- */
+function renderStatusChoices(){
+  const row = document.getElementById('selfStatusRow');
+  row.innerHTML = '';
+  const mine = state.roster.find(p=>p.name.toLowerCase() === state.identity.toLowerCase());
+  const currentStatus = mine ? mine.status : null;
+  document.getElementById('selfNote').value = mine ? (mine.note||'') : '';
+  STATUS_DEFS.forEach(s=>{
+    const div = document.createElement('div');
+    div.className = 'status-choice' + (currentStatus===s.id ? ' selected' : '');
+    div.dataset.status = s.id;
+    div.innerHTML = `<span class="badge ${s.shape}" style="background:${s.color}"></span> ${s.label}`;
+    div.onclick = ()=>{
+      document.querySelectorAll('.status-choice').forEach(el=>el.classList.remove('selected'));
+      div.classList.add('selected');
+    };
+    row.appendChild(div);
+  });
+}
+
+async function submitSelfStatus(){
+  const name = state.identity.trim();
+  if(!name){ alert('Set your name at the top of this tab first.'); return; }
+  const selected = document.querySelector('.status-choice.selected');
+  if(!selected){ alert('Pick a status.'); return; }
+  const status = selected.dataset.status;
+  const note = document.getElementById('selfNote').value.trim();
+  const existing = state.roster.find(p=>p.name.toLowerCase()===name.toLowerCase());
+  if(existing){
+    existing.status = status;
+    existing.note = note;
+    existing.updatedAt = Date.now();
+  }else{
+    state.roster.push({id:uid(), name, status, note, updatedAt: Date.now()});
+  }
+  await safeSet('roster', state.roster, true);
+  renderFilters();
+  renderRoster();
+  renderLanding();
+}
+
+function renderFilters(){
+  const row = document.getElementById('filterRow');
+  row.innerHTML = '';
+  const all = document.createElement('div');
+  all.className = 'chip' + (state.activeFilter==='all' ? ' active':'');
+  all.textContent = 'All (' + state.roster.length + ')';
+  all.onclick = ()=>{ state.activeFilter='all'; renderFilters(); renderRoster(); };
+  row.appendChild(all);
+  STATUS_DEFS.forEach(s=>{
+    const count = state.roster.filter(p=>p.status===s.id).length;
+    const chip = document.createElement('div');
+    chip.className = 'chip' + (state.activeFilter===s.id ? ' active':'');
+    chip.textContent = s.label + ' (' + count + ')';
+    chip.onclick = ()=>{ state.activeFilter=s.id; renderFilters(); renderRoster(); };
+    row.appendChild(chip);
+  });
+}
+
+function renderRoster(){
+  const body = document.getElementById('rosterBody');
+  const emptyEl = document.getElementById('rosterEmpty');
+  body.innerHTML = '';
+  let list = state.roster.slice().sort((a,b)=> (b.updatedAt||0) - (a.updatedAt||0));
+  if(state.activeFilter !== 'all'){
+    list = list.filter(p=>p.status === state.activeFilter);
+  }
+  if(!list.length){
+    emptyEl.style.display = 'block';
+    return;
+  }
+  emptyEl.style.display = 'none';
+  list.forEach(p=>{
+    const def = STATUS_DEFS.find(s=>s.id===p.status) || STATUS_DEFS[0];
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${escapeHtml(p.name)}</td>
+      <td><span class="status-pill"><span class="badge ${def.shape}" style="background:${def.color}"></span>${def.label}</span></td>
+      <td style="color:#6b7280;">${escapeHtml(p.note||'—')}</td>
+      <td class="mono" style="color:#9aa0aa; font-size:12px;">${p.updatedAt ? new Date(p.updatedAt).toLocaleDateString() : '—'}</td>
+      <td><span class="rm" onclick="removePerson('${p.id}')">✕</span></td>
+    `;
+    body.appendChild(tr);
+  });
+}
+async function removePerson(id){
+  if(!confirm('Remove this person from the roster?')) return;
+  state.roster = state.roster.filter(p=>p.id!==id);
+  await safeSet('roster', state.roster, true);
+  renderFilters();
+  renderRoster();
+  renderLanding();
+}
+
+/* ---------- POLLS ---------- */
+function toggleNewPoll(){
+  document.getElementById('newPollForm').classList.toggle('open');
+}
+function toggleDetailFields(){
+  const showDetails = document.getElementById('pollHasDetails').checked;
+  document.querySelectorAll('#pollOptionInputs .opt-row').forEach(row=>{
+    row.classList.toggle('show-details', showDetails);
+  });
+}
+function addOptionInput(){
+  const wrap = document.getElementById('pollOptionInputs');
+  const showDetails = document.getElementById('pollHasDetails').checked;
+  const div = document.createElement('div');
+  div.className = 'opt-row' + (showDetails ? ' show-details' : '');
+  div.innerHTML = `
+    <input type="text" class="opt-label" placeholder="Option label">
+    <input type="text" class="opt-url detail-field" placeholder="Link (optional)">
+    <input type="text" class="opt-note detail-field" placeholder="Note — price/night, sleeps, address, etc. (optional)">`;
+  wrap.appendChild(div);
+}
+async function createPoll(){
+  const q = document.getElementById('pollQuestion').value.trim();
+  const allowMultiple = document.getElementById('pollAllowMultiple').checked;
+  const rows = Array.from(document.querySelectorAll('#pollOptionInputs .opt-row'));
+  const options = rows.map(row=>{
+    const label = row.querySelector('.opt-label').value.trim();
+    const url = row.querySelector('.opt-url').value.trim();
+    const note = row.querySelector('.opt-note').value.trim();
+    return label ? {id:uid(), label, url, note} : null;
+  }).filter(Boolean);
+  if(!q || options.length < 2){ alert('Add a question and at least 2 options.'); return; }
+  const poll = {
+    id: uid(),
+    question: q,
+    options,
+    allowMultiple,
+    votes: {},
+    createdAt: Date.now()
+  };
+  state.polls.unshift(poll);
+  await safeSet('polls', state.polls, true);
+  document.getElementById('pollQuestion').value = '';
+  document.getElementById('pollHasDetails').checked = false;
+  document.getElementById('pollAllowMultiple').checked = false;
+  document.getElementById('pollOptionInputs').innerHTML = `
+    <div class="opt-row">
+      <input type="text" class="opt-label" placeholder="Option label" value="Yes">
+      <input type="text" class="opt-url detail-field" placeholder="Link (optional)">
+      <input type="text" class="opt-note detail-field" placeholder="Note — price/night, sleeps, address, etc. (optional)">
+    </div>
+    <div class="opt-row">
+      <input type="text" class="opt-label" placeholder="Option label" value="No">
+      <input type="text" class="opt-url detail-field" placeholder="Link (optional)">
+      <input type="text" class="opt-note detail-field" placeholder="Note — price/night, sleeps, address, etc. (optional)">
+    </div>`;
+  toggleNewPoll();
+  renderPolls();
+}
+
+async function vote(pollId, optionId){
+  const name = state.identity.trim();
+  if(!name){ alert('Type your name at the top of this tab first so your vote is attributed to you.'); return; }
+  const poll = state.polls.find(p=>p.id===pollId);
+  if(!poll) return;
+  const current = poll.votes[name] || [];
+  if(poll.allowMultiple){
+    if(current.includes(optionId)){
+      poll.votes[name] = current.filter(id=>id!==optionId);
+      if(poll.votes[name].length === 0) delete poll.votes[name];
+    }else{
+      poll.votes[name] = [...current, optionId];
+    }
+  }else{
+    poll.votes[name] = [optionId];
+  }
+  await safeSet('polls', state.polls, true);
+
+  // Voting on the RSVP (preferred dates) poll automatically marks the
+  // voter as "Interested" on the roster if they aren't on it yet.
+  // Existing entries are left alone so manual status choices aren't overwritten.
+  if(poll.isRsvpPoll){
+    const existing = state.roster.find(p=>p.name.toLowerCase()===name.toLowerCase());
+    if(!existing){
+      state.roster.push({id:uid(), name, status:'interested', note:'', updatedAt: Date.now()});
+      await safeSet('roster', state.roster, true);
+      renderFilters();
+      renderRoster();
+      renderStatusChoices();
+    }
+  }
+  renderPolls();
+  renderLanding();
+}
+
+async function deletePoll(id){
+  if(!confirm('Delete this poll?')) return;
+  state.polls = state.polls.filter(p=>p.id!==id);
+  await safeSet('polls', state.polls, true);
+  renderPolls();
+  renderLanding();
+}
+
+function buildPollCardHtml(poll){
+  const totalRespondents = Object.keys(poll.votes).length;
+  const myVotes = state.identity ? (poll.votes[state.identity] || []) : [];
+  let optionsHtml = '';
+  poll.options.forEach(opt=>{
+    const count = Object.values(poll.votes).filter(arr=>arr.includes(opt.id)).length;
+    const pct = totalRespondents ? Math.round((count/totalRespondents)*100) : 0;
+    const picked = myVotes.includes(opt.id);
+    const labelHtml = opt.url
+      ? `<a href="${escapeHtml(opt.url)}" target="_blank" rel="noopener" class="opt-link" onclick="event.stopPropagation()">${escapeHtml(opt.label)} ↗</a>`
+      : escapeHtml(opt.label);
+    optionsHtml += `
+      <div class="poll-option ${picked?'picked':''}" onclick="vote('${poll.id}','${opt.id}')">
+        <div class="row"><span class="lbl">${picked?'✓ ':''}${labelHtml}</span><span class="mono">${count} · ${pct}%</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+        ${opt.note ? `<div class="opt-note-display">${escapeHtml(opt.note)}</div>` : ''}
+      </div>`;
+  });
+  const hint = poll.allowMultiple ? 'Tap any options that work for you — you can pick more than one' : 'Tap an option to vote or change your vote';
+  return `
+    <p class="poll-q">${escapeHtml(poll.question)}</p>
+    <div class="poll-meta">${totalRespondents} respondent${totalRespondents===1?'':'s'}${poll.allowMultiple ? ' · multiple choice' : ''} · created ${new Date(poll.createdAt).toLocaleDateString()}</div>
+    ${optionsHtml}
+    <div class="poll-footer">
+      <span class="save-hint">${hint}</span>
+      <span class="rm" onclick="deletePoll('${poll.id}')" style="cursor:pointer; color:#c6cad3;">Delete poll</span>
+    </div>
+  `;
+}
+
+function renderPolls(){
+  const el = document.getElementById('pollsList');
+  el.innerHTML = '';
+  if(!state.polls.length){
+    el.innerHTML = '<div class="empty">No polls yet — create one above.</div>';
+    return;
+  }
+  state.polls.forEach(poll=>{
+    const card = document.createElement('div');
+    card.className = 'poll-card';
+    card.innerHTML = buildPollCardHtml(poll);
+    el.appendChild(card);
+  });
+}
+
+/* ---------- LANDING ---------- */
+function renderLanding(){
+  const rsvpPoll = state.polls.find(p=>p.isRsvpPoll);
+  const area = document.getElementById('landingPollArea');
+  if(!rsvpPoll){
+    area.innerHTML = '<div class="empty">No dates poll yet — create one on the Polls tab.</div>';
+  }else{
+    area.innerHTML = `<div class="poll-card">${buildPollCardHtml(rsvpPoll)}</div>`;
+    document.getElementById('landingTitle').textContent = rsvpPoll.question;
+  }
+
+  const body = document.getElementById('landingResponsesBody');
+  const emptyEl = document.getElementById('landingResponsesEmpty');
+  body.innerHTML = '';
+  if(!rsvpPoll || !Object.keys(rsvpPoll.votes).length){
+    emptyEl.style.display = 'block';
+    return;
+  }
+  emptyEl.style.display = 'none';
+  Object.keys(rsvpPoll.votes).sort().forEach(voter=>{
+    const optionIds = rsvpPoll.votes[voter];
+    const labels = optionIds
+      .map(id=> (rsvpPoll.options.find(o=>o.id===id) || {}).label)
+      .filter(Boolean)
+      .join(', ') || '—';
+    const person = state.roster.find(p=>p.name.toLowerCase()===voter.toLowerCase());
+    const def = person ? (STATUS_DEFS.find(s=>s.id===person.status) || STATUS_DEFS[0]) : STATUS_DEFS[0];
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${escapeHtml(voter)}</td>
+      <td>${escapeHtml(labels)}</td>
+      <td><span class="status-pill"><span class="badge ${def.shape}" style="background:${def.color}"></span>${def.label}</span></td>
+    `;
+    body.appendChild(tr);
+  });
+}
+
+function escapeHtml(str){
+  if(str === undefined || str === null) return '';
+  return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+
+init();
+</script>
+</body>
+</html>
